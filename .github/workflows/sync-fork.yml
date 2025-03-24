@@ -1,0 +1,29 @@
+name: Sync Fork with Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Git and add upstream
+        run: |
+          git remote add upstream https://github.com/timeweb-cloud/app-example-celery.git
+          git fetch upstream
+
+      - name: Merge upstream changes into master
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout master
+          git merge upstream/master --no-edit || echo "No changes to merge"
+
+      - name: Push changes to fork
+        run: |
+          git push origin master
